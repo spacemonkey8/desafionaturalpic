@@ -1,23 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+import Context from "./context";
+import { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Home from "./views/Home";
+import Favoritos from "./views/Favoritos";
+import "./styles.css";
+
+
+
 
 function App() {
+  const endpoint = "/fotos.json";
+  const [photos, setPhotos] = useState([]);
+  const sharedData = { photos, setPhotos };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch(endpoint);
+      const data = await res.json();
+      setPhotos(data.photos);
+    };
+    fetchData().catch(console.error);
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Context.Provider value={sharedData}>
+        <BrowserRouter>
+          <Navbar />
+
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/favoritos" element={<Favoritos  />} />
+          </Routes>
+        </BrowserRouter>
+      </Context.Provider>
     </div>
   );
 }
